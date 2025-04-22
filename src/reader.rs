@@ -1,32 +1,35 @@
 use cid::Cid;
 use futures::Stream;
+use serde::de;
 use tokio::io::AsyncRead;
 
 use crate::{
     error::Error,
-    header::CarHeader,
+    header::CarHeaderV1,
     util::{ld_read, read_node},
 };
 
 /// Reads CAR files that are in a BufReader
 #[derive(Debug)]
-pub struct CarReader<R> {
+pub struct CarReader<R, H> {
     reader: R,
-    header: CarHeader,
+    header: H,
     buffer: Vec<u8>,
 }
 
-impl<R> CarReader<R>
+impl<R, H> CarReader<R, H>
 where
+    H: de::DeserializeOwned,
     R: AsyncRead + Unpin,
 {
     /// Creates a new CarReader and parses the CarHeader
-    pub async fn new(mut reader: R) -> Result<Self, Error> {
+    pub async fn read(mut reader: R) -> Result<Self, Error> {
         let mut buffer = Vec::new();
 
         match ld_read(&mut reader, &mut buffer).await? {
             Some(buf) => {
-                let header = CarHeader::decode(buf)?;
+                let header: H = serde_ipld_dagcbor::from_reader(buf)
+                    .map_err(|e| Error::Parsing(e.to_string()))?;
 
                 Ok(CarReader {
                     reader,
@@ -41,7 +44,7 @@ where
     }
 
     /// Returns the header of this car file.
-    pub fn header(&self) -> &CarHeader {
+    pub fn header(&self) -> &H {
         &self.header
     }
 
@@ -55,6 +58,16 @@ where
             let maybe_block = read_node(&mut this.reader, &mut this.buffer).await?;
             Ok(maybe_block.map(|b| (b, this)))
         })
+    }
+}
+
+impl<R> CarReader<R, CarHeaderV1>
+where
+    R: AsyncRead + Unpin,
+{
+    /// Creates a new CarReader and parses the CarHeader
+    pub async fn new(reader: R) -> Result<CarReader<R, CarHeaderV1>, Error> {
+        CarReader::read(reader).await
     }
 }
 
@@ -85,7 +98,7 @@ mod tests {
         let digest_foo = multihash_codetable::Code::Blake3_256.digest(b"foo");
         let cid_foo = Cid::new_v1(0x71, digest_foo);
 
-        let header = CarHeader::V1(CarHeaderV1::from(vec![cid_foo]));
+        let header = CarHeaderV1::from(vec![cid_foo]);
 
         let mut buffer = Vec::new();
         let mut writer = CarWriter::new(header, &mut buffer);

@@ -20,7 +20,7 @@ fn write_returns_bytes_written(
         .build()
         .expect("Failed building the Runtime")
         .block_on(async move {
-            let mut writer = CarWriter::new(CarHeader::new_v1(roots), Vec::new());
+            let mut writer = CarWriter::new(CarHeaderV1::new_v1(roots), Vec::new());
             let mut written = 0;
             written += writer.write_header().await.unwrap();
             for block in blocks {

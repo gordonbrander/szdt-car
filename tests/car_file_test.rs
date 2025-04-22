@@ -40,7 +40,7 @@ async fn roundtrip_carv1_basic_fixtures_file() {
     let header = car_reader.header().clone();
 
     assert_eq!(
-        car_reader.header().roots(),
+        car_reader.header().roots,
         [
             "bafyreihyrpefhacm6kkp4ql6j6udakdit7g3dmkzfriqfykhjw6cad5lrm"
                 .parse()
