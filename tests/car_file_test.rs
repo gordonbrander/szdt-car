@@ -1,5 +1,7 @@
+use cid::Cid;
 use futures::TryStreamExt;
 use iroh_car::*;
+use serde::{Deserialize, Serialize};
 use tokio::io::BufReader;
 
 #[cfg(target_arch = "wasm32")]
@@ -29,6 +31,22 @@ async fn roundtrip_carv1_test_file() {
     writer.finish().await.unwrap();
 
     assert_eq!(TEST_V1_CAR, buffer.as_slice());
+}
+
+#[derive(Serialize, Deserialize)]
+struct TestHeader {
+    pub roots: Vec<Cid>,
+    pub version: u64,
+}
+
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+#[cfg_attr(not(target_arch = "wasm32"), tokio::test)]
+async fn car_reader_can_deserialize_custom_header() {
+    let buf_reader = BufReader::new(CAR_V1_BASIC);
+    let car_reader = CarReader::new(buf_reader).await.unwrap();
+    let header: TestHeader = car_reader.deserialize_header().unwrap();
+    assert_eq!(header.roots.len(), 2);
+    assert_eq!(header.version, 1);
 }
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
