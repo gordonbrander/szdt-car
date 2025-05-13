@@ -17,7 +17,7 @@ async fn roundtrip_carv1_test_file() {
     let buf_reader = BufReader::new(TEST_V1_CAR);
 
     let car_reader = CarReader::new(buf_reader).await.unwrap();
-    let header = car_reader.header().clone();
+    let header = car_reader.header().unwrap().clone();
     let files: Vec<_> = car_reader.stream().try_collect().await.unwrap();
     assert_eq!(files.len(), 35);
 
@@ -37,10 +37,10 @@ async fn roundtrip_carv1_basic_fixtures_file() {
     let buf_reader = BufReader::new(CAR_V1_BASIC);
 
     let car_reader = CarReader::new(buf_reader).await.unwrap();
-    let header = car_reader.header().clone();
+    let header = car_reader.header().unwrap().clone();
 
     assert_eq!(
-        car_reader.header().roots(),
+        car_reader.header().unwrap().roots(),
         [
             "bafyreihyrpefhacm6kkp4ql6j6udakdit7g3dmkzfriqfykhjw6cad5lrm"
                 .parse()

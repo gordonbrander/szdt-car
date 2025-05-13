@@ -1,5 +1,6 @@
 use cid::Cid;
 use futures::Stream;
+use serde::de::DeserializeOwned;
 use tokio::io::AsyncRead;
 
 use crate::{
@@ -12,7 +13,7 @@ use crate::{
 #[derive(Debug)]
 pub struct CarReader<R> {
     reader: R,
-    header: CarHeader,
+    header: Vec<u8>,
     buffer: Vec<u8>,
 }
 
@@ -25,24 +26,28 @@ where
         let mut buffer = Vec::new();
 
         match ld_read(&mut reader, &mut buffer).await? {
-            Some(buf) => {
-                let header = CarHeader::decode(buf)?;
-
-                Ok(CarReader {
-                    reader,
-                    header,
-                    buffer,
-                })
-            }
+            Some(buf) => Ok(CarReader {
+                reader,
+                header: buf.to_vec(),
+                buffer,
+            }),
             None => Err(Error::Parsing(
                 "failed to parse uvarint for header".to_string(),
             )),
         }
     }
 
+    /// Deserializes a header from this car file, using a Serde deserializable type.
+    /// This method allows for retreival of arbitrary metadata from the CBOR CAR header.
+    pub fn deserialize_header<T: DeserializeOwned>(&self) -> Result<T, Error> {
+        let header: T = serde_ipld_dagcbor::from_slice(&self.header)
+            .map_err(|e| Error::Parsing(e.to_string()))?;
+        Ok(header)
+    }
+
     /// Returns the header of this car file.
-    pub fn header(&self) -> &CarHeader {
-        &self.header
+    pub fn header(&self) -> Result<CarHeader, Error> {
+        CarHeader::decode(&self.header)
     }
 
     /// Returns the next IPLD Block in the buffer
