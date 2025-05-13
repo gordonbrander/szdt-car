@@ -54,6 +54,27 @@ impl CarHeader {
     }
 }
 
+impl Serialize for CarHeader {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            CarHeader::V1(header) => header.serialize(serializer),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for CarHeader {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let header = CarHeaderV1::deserialize(deserializer)?;
+        Ok(CarHeader::V1(header))
+    }
+}
+
 /// CAR file header version 1.
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 pub struct CarHeaderV1 {

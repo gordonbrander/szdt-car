@@ -1,3 +1,4 @@
+use std::{collections::TryReserveError, convert::Infallible};
 use thiserror::Error;
 
 /// Car utility error
@@ -24,5 +25,17 @@ impl From<cid::Error> for Error {
 impl From<cid::multihash::Error> for Error {
     fn from(err: cid::multihash::Error) -> Error {
         Error::Parsing(err.to_string())
+    }
+}
+
+impl From<serde_ipld_dagcbor::error::DecodeError<Infallible>> for Error {
+    fn from(err: serde_ipld_dagcbor::error::DecodeError<Infallible>) -> Error {
+        Error::Cbor(err.into())
+    }
+}
+
+impl From<serde_ipld_dagcbor::error::EncodeError<TryReserveError>> for Error {
+    fn from(err: serde_ipld_dagcbor::error::EncodeError<TryReserveError>) -> Error {
+        Error::Cbor(err.into())
     }
 }
