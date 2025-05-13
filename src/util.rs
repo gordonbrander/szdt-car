@@ -7,6 +7,11 @@ use super::error::Error;
 /// Maximum size that is used for single node.
 pub(crate) const MAX_ALLOC: usize = 4 * 1024 * 1024;
 
+/// Read block of length described by varint leading bytes, returning a buffer slice containing
+/// the data portion of the block.
+///
+/// Returns a result for the buffer slice containing the data portion of the block, or `Ok(None)`
+/// if block does not begin with a valid varint.
 pub(crate) async fn ld_read<R>(mut reader: R, buf: &mut Vec<u8>) -> Result<Option<&[u8]>, Error>
 where
     R: AsyncRead + Unpin,
