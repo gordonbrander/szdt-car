@@ -1,21 +1,23 @@
 use cid::Cid;
+use serde::Serialize;
 use tokio::io::{AsyncWrite, AsyncWriteExt};
 
-use crate::{error::Error, header::CarHeader, util::write_varint_usize};
+use crate::{error::Error, util::write_varint_usize};
 
 #[derive(Debug)]
-pub struct CarWriter<W> {
-    header: CarHeader,
+pub struct CarWriter<H, W> {
+    header: H,
     writer: W,
     cid_buffer: Vec<u8>,
     is_header_written: bool,
 }
 
-impl<W> CarWriter<W>
+impl<H, W> CarWriter<H, W>
 where
+    H: Serialize,
     W: AsyncWrite + Send + Unpin,
 {
-    pub fn new(header: CarHeader, writer: W) -> Self {
+    pub fn new(header: H, writer: W) -> Self {
         CarWriter {
             header,
             writer,
@@ -32,7 +34,7 @@ where
 
         if !self.is_header_written {
             // Write header bytes
-            let header_bytes = self.header.encode()?;
+            let header_bytes = serde_ipld_dagcbor::to_vec(&self.header)?;
             written += write_varint_usize(header_bytes.len(), &mut self.writer).await?;
             self.writer.write_all(&header_bytes).await?;
             written += header_bytes.len();
