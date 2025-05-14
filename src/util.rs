@@ -98,7 +98,7 @@ mod tests {
     #[cfg(target_arch = "wasm32")]
     wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
-    async fn ld_write<'a, W>(writer: &mut W, bytes: &[u8]) -> Result<(), Error>
+    async fn ld_write<W>(writer: &mut W, bytes: &[u8]) -> Result<(), Error>
     where
         W: AsyncWrite + Send + Unpin,
     {
