@@ -443,26 +443,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "iroh-car"
-version = "0.5.0"
-dependencies = [
- "anyhow",
- "cid",
- "futures",
- "getrandom",
- "multihash",
- "multihash-codetable",
- "proptest",
- "serde",
- "serde_ipld_dagcbor",
- "test-strategy",
- "thiserror",
- "tokio",
- "unsigned-varint 0.7.2",
- "wasm-bindgen-test",
-]
-
-[[package]]
 name = "js-sys"
 version = "0.3.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -966,6 +946,26 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.85",
+]
+
+[[package]]
+name = "szdt-car"
+version = "0.6.0"
+dependencies = [
+ "anyhow",
+ "cid",
+ "futures",
+ "getrandom",
+ "multihash",
+ "multihash-codetable",
+ "proptest",
+ "serde",
+ "serde_ipld_dagcbor",
+ "test-strategy",
+ "thiserror",
+ "tokio",
+ "unsigned-varint 0.7.2",
+ "wasm-bindgen-test",
 ]
 
 [[package]]
