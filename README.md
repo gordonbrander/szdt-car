@@ -1,6 +1,6 @@
 # szdt-car
 
-[![CI](https://img.shields.io/github/actions/workflow/status/n0-computer/szdt-car/ci.yml)](https://github.com/n0-computer/szdt-car/actions?query=workflow%3A%22Continuous+integration%22)
+[![CI](https://img.shields.io/github/actions/workflow/status/gordonbrander/szdt-car/ci.yml)](https://github.com/n0-computer/szdt-car/actions?query=workflow%3A%22Continuous+integration%22)
 
 [.car](https://dasl.ing/car.html) support for [SZDT](https://github.com/gordonbrander/szdt). "CAR" stands
 for Content Addressable aRchives. A CAR file contains a series of content-addressed data blocks.
