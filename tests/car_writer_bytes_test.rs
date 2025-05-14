@@ -1,8 +1,8 @@
 use cid::Cid;
-use iroh_car::*;
 use multihash::Multihash;
 use multihash_codetable::{Code, MultihashDigest};
 use proptest::{collection::vec, prelude::any, prop_assert_eq, strategy::Strategy};
+use szdt_car::*;
 use test_strategy::proptest;
 
 fn identity_hash_cid() -> impl Strategy<Value = Cid> {
